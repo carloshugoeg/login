@@ -19,11 +19,65 @@ npm run dev
 
 Abre <http://localhost:3000>. Con `MAIL_TRANSPORT=console` (el valor por
 omisión) el correo de confirmación **se imprime en la terminal**: copia el
-enlace de ahí y ábrelo.
+enlace de ahí y ábrelo. Para enviarlo de verdad, ver
+[Envío real por SMTP](#envío-real-por-smtp).
 
 ```bash
-npm test                  # 47 pruebas: unitarias, integración y extremo a extremo
+npm test                  # 51 pruebas: unitarias, integración y extremo a extremo
 ```
+
+## Envío real por SMTP
+
+**1. Consigue credenciales.** Con Gmail:
+
+- Activa la verificación en dos pasos en tu cuenta de Google.
+- Entra a <https://myaccount.google.com/apppasswords> y crea una
+  **contraseña de aplicación**. Son 16 letras. La contraseña normal de la
+  cuenta NO funciona por SMTP.
+
+Cualquier otro proveedor sirve igual (Brevo, Mailtrap, Resend, el SMTP de tu
+universidad): solo cambian host, puerto y usuario.
+
+**2. Rellena `.env`** — este archivo está en `.gitignore`, la contraseña no
+se sube a git:
+
+```dotenv
+MAIL_TRANSPORT=smtp
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=tu-correo@gmail.com
+SMTP_PASSWORD=las16letras
+MAIL_FROM="Registro Lab <tu-correo@gmail.com>"
+```
+
+**3. Comprueba el envío** antes de tocar el formulario:
+
+```bash
+npm run mail:test -- tu-correo@gmail.com
+```
+
+Verifica credenciales y conexión, manda un correo de ejemplo y, si algo
+falla, explica qué revisar. Cuando esto funcione, el registro también.
+
+**4. Reinicia el servidor** para que tome el `.env` nuevo.
+
+### El enlace del correo y `APP_BASE_URL`
+
+El enlace de confirmación se construye con `APP_BASE_URL`. Con el valor por
+omisión (`http://localhost:3000`) el correo llega de verdad, pero **el enlace
+solo abre en la máquina donde corre el servidor**. Basta si te registras tú
+mismo desde tu computadora.
+
+Para que otra persona pueda confirmar desde su teléfono o su equipo, el
+servidor necesita una dirección alcanzable: un túnel (`ngrok http 3000`,
+`cloudflared tunnel --url http://localhost:3000`) o un despliegue real. Pon
+esa URL en `APP_BASE_URL` y reinicia.
+
+### Si el envío falla
+
+El registro responde `502 MAIL_DELIVERY_FAILED` y **descarta el pendiente**,
+para que puedas reintentar con el mismo correo sin chocar con el registro
+anterior. `npm run mail:test` da el diagnóstico detallado.
 
 ## Flujo
 
@@ -64,6 +118,7 @@ archivo, [`src/infrastructure/config/container.js`](src/infrastructure/config/co
 |---|---|---|
 | Añadir "la contraseña necesita un símbolo" | un archivo nuevo en `domain/validation/rules/` + una línea en el container | `RuleSet`, casos de uso, controladores |
 | Enviar por SMTP en vez de consola | `MAIL_TRANSPORT=smtp` en `.env` | ninguna línea de código |
+| Añadir un tercer transporte (una API HTTP, por ejemplo) | una clase que implemente `MailSender` + una rama en `createMailSender.js` | casos de uso, plantilla, controladores |
 | Cambiar bcrypt por otro algoritmo | una clase nueva que implemente `PasswordHasher` + una línea | `RegisterUser` |
 | Probar sin base de datos | los adaptadores `persistence/memory/` | nada del dominio |
 

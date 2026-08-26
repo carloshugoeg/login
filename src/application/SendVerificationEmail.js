@@ -1,3 +1,5 @@
+import { MailDeliveryError } from '../domain/errors/MailDeliveryError.js';
+
 /**
  * Arma el enlace, pide el mensaje a la plantilla y lo entrega al transporte.
  *
@@ -19,7 +21,13 @@ export class SendVerificationEmail {
     const verificationUrl =
       `${this.#baseUrl}/verify?code=${encodeURIComponent(pending.verificationCode)}`;
     const message = this.#template.build({ pending, verificationUrl });
-    await this.#mailSender.send({ to: pending.email, ...message });
+
+    try {
+      await this.#mailSender.send({ to: pending.email, ...message });
+    } catch (cause) {
+      // El fallo del transporte no debe llegar al usuario como un 500 opaco.
+      throw new MailDeliveryError(cause);
+    }
     return verificationUrl;
   }
 }

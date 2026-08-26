@@ -24,6 +24,11 @@ export class SmtpMailSender extends MailSender {
     });
   }
 
+  /** Comprueba credenciales y conectividad sin enviar nada. */
+  async verify() {
+    await this.#transporter.verify();
+  }
+
   async send({ to, subject, text, html }) {
     await this.#transporter.sendMail({ from: this.#from, to, subject, text, html });
   }
