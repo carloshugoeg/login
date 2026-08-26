@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Usuarios registrados</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="centered">
+  <main class="card wide">
+    <h1>Usuarios registrados</h1>
+    <p class="lede">Solo aparecen las cuentas que ya confirmaron su correo.</p>
+
+    <table id="users-table" hidden>
+      <thead>
+        <tr>
+          <th>Correo</th><th>Nombre</th><th>Apellidos</th><th>Edad</th><th>Confirmado</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <p id="users-empty" hidden>Todavía no hay ninguna cuenta confirmada.</p>
+    <p class="form-error" id="users-error" hidden></p>
+
+    <p class="footer-link"><a href="/">Volver al formulario</a></p>
+  </main>
+
+  <script type="module" src="/js/users.js"></script>
+</body>
+</html>

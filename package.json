@@ -1,0 +1,24 @@
+{
+  "name": "registro-usuarios-lab",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Registro de usuarios con validación por correo (laboratorio de programación web)",
+  "scripts": {
+    "start": "node src/infrastructure/http/server.js",
+    "dev": "node --watch src/infrastructure/http/server.js",
+    "test": "node --test \"tests/**/*.test.js\""
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^13.0.3",
+    "express": "^5.2.1",
+    "nodemailer": "^9.0.5"
+  },
+  "devDependencies": {
+    "supertest": "^7.2.2"
+  }
+}

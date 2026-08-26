@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Crear cuenta</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="centered">
+  <main class="card">
+    <h1>Crear cuenta</h1>
+    <p class="lede">Te enviaremos un correo para confirmar tu registro.</p>
+
+    <form id="registration-form" novalidate>
+      <div class="field">
+        <label for="email">Correo electrónico</label>
+        <input id="email" name="email" type="email" autocomplete="email" required>
+        <p class="field-error" data-error-for="email"></p>
+      </div>
+
+      <div class="field">
+        <label for="firstName">Nombre</label>
+        <input id="firstName" name="firstName" type="text" autocomplete="given-name" required>
+        <p class="field-error" data-error-for="firstName"></p>
+      </div>
+
+      <div class="field">
+        <label for="lastName">Apellidos</label>
+        <input id="lastName" name="lastName" type="text" autocomplete="family-name" required>
+        <p class="field-error" data-error-for="lastName"></p>
+      </div>
+
+      <div class="field">
+        <label for="age">Edad</label>
+        <input id="age" name="age" type="number" min="13" max="120" inputmode="numeric" required>
+        <p class="field-error" data-error-for="age"></p>
+      </div>
+
+      <div class="field">
+        <label for="password">Contraseña</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" required>
+        <p class="hint">Mínimo 8 caracteres, con al menos una letra y un dígito.</p>
+        <p class="field-error" data-error-for="password"></p>
+      </div>
+
+      <p class="form-error" data-error-for="_form"></p>
+      <button type="submit">Crear cuenta</button>
+    </form>
+
+    <section id="sent-panel" hidden>
+      <h2 class="ok">Revisa tu correo</h2>
+      <p id="sent-message"></p>
+      <button type="button" id="resend-button" class="secondary">Reenviar correo</button>
+      <p class="form-error" data-error-for="_resend"></p>
+    </section>
+
+    <p class="footer-link"><a href="/users.html">Ver usuarios registrados</a></p>
+  </main>
+
+  <script type="module" src="/js/registration.js"></script>
+</body>
+</html>
