@@ -54,7 +54,15 @@ export class RegisterUser {
     });
 
     const saved = this.#pendingRegistrations.save(pending);
-    await this.#sendVerificationEmail.execute(saved);
+
+    try {
+      await this.#sendVerificationEmail.execute(saved);
+    } catch (error) {
+      // Sin correo enviado no hay forma de confirmar: no dejamos basura
+      // en la tabla de pendientes bloqueando un reintento.
+      this.#pendingRegistrations.removeById(saved.id);
+      throw error;
+    }
     return saved;
   }
 }

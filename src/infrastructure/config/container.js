@@ -8,8 +8,7 @@ import { AgeRangeRule } from '../../domain/validation/rules/AgeRangeRule.js';
 import { EmailFormatRule } from '../../domain/validation/rules/EmailFormatRule.js';
 import { PasswordStrengthRule } from '../../domain/validation/rules/PasswordStrengthRule.js';
 import { RequiredNameRule } from '../../domain/validation/rules/RequiredNameRule.js';
-import { ConsoleMailSender } from '../mail/ConsoleMailSender.js';
-import { SmtpMailSender } from '../mail/SmtpMailSender.js';
+import { createMailSender } from '../mail/createMailSender.js';
 import { VerificationEmailTemplate } from '../mail/templates/VerificationEmailTemplate.js';
 import { createDatabase } from '../persistence/sqlite/Database.js';
 import { SqlitePendingRegistrationRepository } from '../persistence/sqlite/SqlitePendingRegistrationRepository.js';
@@ -74,15 +73,3 @@ export function buildContainer(env, overrides = {}) {
   };
 }
 
-function createMailSender(env) {
-  if (env.mail.transport === 'smtp') {
-    return SmtpMailSender.fromConfig({
-      host: env.mail.host,
-      port: env.mail.port,
-      user: env.mail.user,
-      password: env.mail.password,
-      from: env.mail.from,
-    });
-  }
-  return new ConsoleMailSender();
-}
