@@ -75,7 +75,7 @@ describe('VerifyRegistration', () => {
   it('promueve el pendiente a usuario y lo borra de pendientes', async () => {
     const pending = await ctx.registerUser.execute(validInput());
 
-    const user = ctx.verifyRegistration.execute(pending.verificationCode);
+    const user = await ctx.verifyRegistration.execute(pending.verificationCode);
 
     assert.equal(user.email, 'ana@example.com');
     assert.ok(user.verifiedAt);
@@ -85,18 +85,21 @@ describe('VerifyRegistration', () => {
 
   it('conserva el hash de la contraseña al promover', async () => {
     const pending = await ctx.registerUser.execute(validInput());
-    const user = ctx.verifyRegistration.execute(pending.verificationCode);
+    const user = await ctx.verifyRegistration.execute(pending.verificationCode);
     assert.equal(user.passwordHash, pending.passwordHash);
   });
 
   it('rechaza un código desconocido, vacío o ya usado', async () => {
-    assert.throws(() => ctx.verifyRegistration.execute('inventado'), TokenNotFoundError);
-    assert.throws(() => ctx.verifyRegistration.execute(''), TokenNotFoundError);
-    assert.throws(() => ctx.verifyRegistration.execute(undefined), TokenNotFoundError);
+    await assert.rejects(() => ctx.verifyRegistration.execute('inventado'), TokenNotFoundError);
+    await assert.rejects(() => ctx.verifyRegistration.execute(''), TokenNotFoundError);
+    await assert.rejects(() => ctx.verifyRegistration.execute(undefined), TokenNotFoundError);
 
     const pending = await ctx.registerUser.execute(validInput());
-    ctx.verifyRegistration.execute(pending.verificationCode);
-    assert.throws(() => ctx.verifyRegistration.execute(pending.verificationCode), TokenNotFoundError);
+    await ctx.verifyRegistration.execute(pending.verificationCode);
+    await assert.rejects(
+      () => ctx.verifyRegistration.execute(pending.verificationCode),
+      TokenNotFoundError,
+    );
     assert.equal(ctx.users.findAll().length, 1);
   });
 });
@@ -121,17 +124,17 @@ describe('ResendVerification', () => {
 describe('ListUsers', () => {
   it('solo lista cuentas verificadas', async () => {
     const pending = await ctx.registerUser.execute(validInput());
-    assert.deepEqual(ctx.listUsers.execute(), []);
+    assert.deepEqual(await ctx.listUsers.execute(), []);
 
-    ctx.verifyRegistration.execute(pending.verificationCode);
-    assert.equal(ctx.listUsers.execute().length, 1);
+    await ctx.verifyRegistration.execute(pending.verificationCode);
+    assert.equal((await ctx.listUsers.execute()).length, 1);
   });
 
   it('la representación pública no expone el hash', async () => {
     const pending = await ctx.registerUser.execute(validInput());
-    ctx.verifyRegistration.execute(pending.verificationCode);
+    await ctx.verifyRegistration.execute(pending.verificationCode);
 
-    const [user] = ctx.listUsers.execute();
+    const [user] = await ctx.listUsers.execute();
     assert.equal(user.toPublicJSON().passwordHash, undefined);
   });
 });

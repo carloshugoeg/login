@@ -3,7 +3,6 @@ import { afterEach, beforeEach, describe, it } from 'node:test';
 import request from 'supertest';
 import { buildContainer } from '../../src/infrastructure/config/container.js';
 import { createApp } from '../../src/infrastructure/http/app.js';
-import { createDatabase } from '../../src/infrastructure/persistence/sqlite/Database.js';
 import { FakeMailSender } from '../support/FakeMailSender.js';
 import { validInput } from '../support/fixtures.js';
 
@@ -11,16 +10,16 @@ const silentLogger = { error() {}, log() {} };
 
 let app, container, mailSender;
 
-beforeEach(() => {
+beforeEach(async () => {
   mailSender = new FakeMailSender();
-  container = buildContainer(
+  container = await buildContainer(
     {
-      databasePath: ':memory:',
+      db: { engine: 'sqlite', path: ':memory:' },
       baseUrl: 'http://localhost:3000',
       bcryptRounds: 4,
       mail: { transport: 'console' },
     },
-    { db: createDatabase(':memory:'), mailSender },
+    { mailSender },
   );
   app = createApp(container, { logger: silentLogger });
 });

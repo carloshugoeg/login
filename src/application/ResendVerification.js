@@ -15,7 +15,7 @@ export class ResendVerification {
 
   async execute(rawEmail) {
     const email = String(rawEmail ?? '').trim().toLowerCase();
-    const pending = email === '' ? null : this.#pendingRegistrations.findByEmail(email);
+    const pending = email === '' ? null : await this.#pendingRegistrations.findByEmail(email);
     if (!pending) throw new PendingRegistrationNotFoundError(email);
 
     await this.#sendVerificationEmail.execute(pending);

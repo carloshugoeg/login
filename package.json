@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Registro de usuarios con validaci\u00f3n por correo (laboratorio de programaci\u00f3n web)",
+  "description": "Registro de usuarios con validación por correo (laboratorio de programación web)",
   "scripts": {
     "start": "node src/infrastructure/http/server.js",
     "dev": "node --watch src/infrastructure/http/server.js",
@@ -17,7 +17,8 @@
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^13.0.3",
     "express": "^5.2.1",
-    "nodemailer": "^9.0.5"
+    "nodemailer": "^9.0.5",
+    "pg": "^8.23.0"
   },
   "devDependencies": {
     "supertest": "^7.2.2"

@@ -6,7 +6,8 @@ export class UserController {
     this.index = this.index.bind(this);
   }
 
-  index(_req, res) {
-    res.json({ users: this.#listUsers.execute().map((user) => user.toPublicJSON()) });
+  async index(_req, res) {
+    const users = await this.#listUsers.execute();
+    res.json({ users: users.map((user) => user.toPublicJSON()) });
   }
 }

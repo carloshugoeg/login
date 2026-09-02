@@ -10,26 +10,21 @@ import { PasswordStrengthRule } from '../../domain/validation/rules/PasswordStre
 import { RequiredNameRule } from '../../domain/validation/rules/RequiredNameRule.js';
 import { createMailSender } from '../mail/createMailSender.js';
 import { VerificationEmailTemplate } from '../mail/templates/VerificationEmailTemplate.js';
-import { createDatabase } from '../persistence/sqlite/Database.js';
-import { SqlitePendingRegistrationRepository } from '../persistence/sqlite/SqlitePendingRegistrationRepository.js';
-import { SqliteTransactionRunner } from '../persistence/sqlite/SqliteTransactionRunner.js';
-import { SqliteUserRepository } from '../persistence/sqlite/SqliteUserRepository.js';
+import { createPersistence } from '../persistence/createPersistence.js';
 import { BcryptPasswordHasher } from '../security/BcryptPasswordHasher.js';
 import { RandomCodeGenerator } from '../security/RandomCodeGenerator.js';
 
 /**
- * Composition root: el ÚNICO archivo que elige implementaciones concretas.
+ * Composition root: compone los casos de uso con implementaciones concretas.
  *
- * Cambiar de transporte de correo, de algoritmo de hash o añadir una regla
- * de validación se hace aquí; ni el dominio ni los casos de uso se enteran.
+ * No decide el motor de base de datos ni el transporte de correo: eso lo
+ * hacen sus fábricas (`createPersistence`, `createMailSender`). Cambiar de
+ * motor, de transporte o añadir una regla de validación no toca el dominio
+ * ni los casos de uso.
  */
-export function buildContainer(env, overrides = {}) {
-  const db = overrides.db ?? createDatabase(env.databasePath);
-
-  const users = overrides.users ?? new SqliteUserRepository(db);
-  const pendingRegistrations =
-    overrides.pendingRegistrations ?? new SqlitePendingRegistrationRepository(db);
-  const transactions = overrides.transactions ?? new SqliteTransactionRunner(db);
+export async function buildContainer(env, overrides = {}) {
+  const persistence = overrides.persistence ?? (await createPersistence(env));
+  const { users, pendingRegistrations, transactions } = persistence;
 
   const rules =
     overrides.rules ??
@@ -53,7 +48,6 @@ export function buildContainer(env, overrides = {}) {
   });
 
   return {
-    db,
     pendingRegistrations,
     users,
     registerUser: new RegisterUser({
@@ -68,7 +62,7 @@ export function buildContainer(env, overrides = {}) {
     resendVerification: new ResendVerification({ pendingRegistrations, sendVerificationEmail }),
     listUsers: new ListUsers({ users }),
     close() {
-      db.close();
+      return persistence.close();
     },
   };
 }

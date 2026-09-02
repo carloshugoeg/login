@@ -6,7 +6,7 @@ export class ListUsers {
     this.#users = users;
   }
 
-  execute() {
+  async execute() {
     return this.#users.findAll();
   }
 }

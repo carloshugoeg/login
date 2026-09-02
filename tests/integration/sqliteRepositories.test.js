@@ -101,10 +101,10 @@ describe('SqliteUserRepository', () => {
 });
 
 describe('SqliteTransactionRunner', () => {
-  it('confirma la promoción como una sola unidad', () => {
+  it('confirma la promoción como una sola unidad', async () => {
     const pending = pendings.save(pendingFixture());
 
-    transactions.run(() => {
+    await transactions.run(() => {
       users.add(User.fromPendingRegistration(pending, new Date().toISOString()));
       pendings.removeById(pending.id);
     });
@@ -113,10 +113,10 @@ describe('SqliteTransactionRunner', () => {
     assert.equal(pendings.count(), 0);
   });
 
-  it('revierte todo si algo falla a mitad', () => {
+  it('revierte todo si algo falla a mitad', async () => {
     const pending = pendings.save(pendingFixture());
 
-    assert.throws(() =>
+    await assert.rejects(() =>
       transactions.run(() => {
         users.add(User.fromPendingRegistration(pending, new Date().toISOString()));
         pendings.removeById(pending.id);
