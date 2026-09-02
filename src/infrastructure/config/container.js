@@ -37,7 +37,7 @@ export function buildContainer(env, overrides = {}) {
       new EmailFormatRule(),
       new RequiredNameRule('firstName', 'El nombre'),
       new RequiredNameRule('lastName', 'Los apellidos'),
-      new AgeRangeRule({ min: 13, max: 120 }),
+      new AgeRangeRule({ min: 18, max: 120 }),
       new PasswordStrengthRule({ minLength: 8 }),
     ]);
 

@@ -45,10 +45,10 @@ describe('RequiredNameRule', () => {
 });
 
 describe('AgeRangeRule', () => {
-  const rule = new AgeRangeRule({ min: 13, max: 120 });
+  const rule = new AgeRangeRule({ min: 18, max: 120 });
 
   it('acepta los extremos del rango', () => {
-    assert.deepEqual(rule.validate({ age: 13 }), []);
+    assert.deepEqual(rule.validate({ age: 18 }), []);
     assert.deepEqual(rule.validate({ age: 120 }), []);
   });
 
@@ -57,7 +57,7 @@ describe('AgeRangeRule', () => {
   });
 
   it('rechaza fuera de rango, decimales y no numéricos', () => {
-    assert.equal(rule.validate({ age: 12 }).length, 1);
+    assert.equal(rule.validate({ age: 17 }).length, 1);
     assert.equal(rule.validate({ age: 121 }).length, 1);
     assert.equal(rule.validate({ age: 30.5 }).length, 1);
     assert.equal(rule.validate({ age: 'treinta' }).length, 1);
@@ -68,12 +68,16 @@ describe('AgeRangeRule', () => {
 describe('PasswordStrengthRule', () => {
   const rule = new PasswordStrengthRule({ minLength: 8 });
 
-  it('acepta una contraseña con letra y dígito', () => {
-    assert.deepEqual(rule.validate({ password: 'secreta123' }), []);
+  it('acepta una contraseña con letra, dígito y carácter especial', () => {
+    assert.deepEqual(rule.validate({ password: 'secreta123!' }), []);
+  });
+
+  it('rechaza si falta el carácter especial', () => {
+    assert.equal(rule.validate({ password: 'secreta123' }).length, 1);
   });
 
   it('acumula todos los defectos de una vez', () => {
-    assert.equal(rule.validate({ password: '...' }).length, 3);
+    assert.equal(rule.validate({ password: 'a' }).length, 3);
   });
 });
 
@@ -91,13 +95,13 @@ describe('RuleSet', () => {
   });
 
   it('acepta una regla nueva sin modificar RuleSet (OCP)', () => {
-    const reglaDeSimbolo = {
+    const reglaDeMayuscula = {
       field: 'password',
       validate: ({ password }) =>
-        /[^\w\s]/.test(password ?? '') ? [] : ['La contraseña debe incluir un símbolo.'],
+        /[A-Z]/.test(password ?? '') ? [] : ['La contraseña debe incluir una mayúscula.'],
     };
-    const result = new RuleSet([new PasswordStrengthRule(), reglaDeSimbolo]).validate(validInput());
-    assert.deepEqual(result.errors.password, ['La contraseña debe incluir un símbolo.']);
+    const result = new RuleSet([new PasswordStrengthRule(), reglaDeMayuscula]).validate(validInput());
+    assert.deepEqual(result.errors.password, ['La contraseña debe incluir una mayúscula.']);
   });
 });
 

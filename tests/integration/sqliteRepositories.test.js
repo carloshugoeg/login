@@ -11,7 +11,10 @@ import { SqliteTransactionRunner } from '../../src/infrastructure/persistence/sq
 import { SqliteUserRepository } from '../../src/infrastructure/persistence/sqlite/SqliteUserRepository.js';
 
 const dir = mkdtempSync(join(tmpdir(), 'registro-lab-'));
-after(() => rmSync(dir, { recursive: true, force: true }));
+after(() => {
+  db?.close();
+  rmSync(dir, { recursive: true, force: true });
+});
 
 let db, users, pendings, transactions;
 let dbCount = 0;

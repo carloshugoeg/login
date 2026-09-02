@@ -30,11 +30,11 @@ describe('RegisterUser', () => {
   });
 
   it('nunca guarda ni envía la contraseña en claro', async () => {
-    const pending = await ctx.registerUser.execute(validInput({ password: 'secreta123' }));
+    const pending = await ctx.registerUser.execute(validInput({ password: 'secreta123!' }));
 
-    assert.notEqual(pending.passwordHash, 'secreta123');
-    assert.ok(!ctx.mailSender.last.text.includes('secreta123'));
-    assert.ok(!ctx.mailSender.last.html.includes('secreta123'));
+    assert.notEqual(pending.passwordHash, 'secreta123!');
+    assert.ok(!ctx.mailSender.last.text.includes('secreta123!'));
+    assert.ok(!ctx.mailSender.last.html.includes('secreta123!'));
   });
 
   it('normaliza el correo', async () => {

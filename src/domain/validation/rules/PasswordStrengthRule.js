@@ -20,6 +20,9 @@ export class PasswordStrengthRule extends Rule {
     }
     if (!/[a-záéíóúñ]/i.test(value)) messages.push('La contraseña debe incluir al menos una letra.');
     if (!/\d/.test(value)) messages.push('La contraseña debe incluir al menos un dígito.');
+    if (!/[^a-záéíóúñ0-9\s]/i.test(value)) {
+      messages.push('La contraseña debe incluir al menos un carácter especial.');
+    }
     return messages;
   }
 }
