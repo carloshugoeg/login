@@ -1,8 +1,9 @@
 # Registro de usuarios con validación por correo
 
 Laboratorio de programación web. Un formulario de registro (correo, nombre,
-apellidos, edad, contraseña) sobre SQLite local donde **nadie llega a la tabla
-`users` hasta confirmar su correo**.
+apellidos, edad, contraseña) donde **nadie llega a la tabla `users` hasta
+confirmar su correo**. El motor de base de datos se elige por configuración
+(`DB_ENGINE`): PostgreSQL o SQLite local.
 
 El código está organizado para que el principio de responsabilidad única (SRP)
 y el principio abierto/cerrado (OCP) se vean en la estructura, no en los
@@ -23,7 +24,7 @@ enlace de ahí y ábrelo. Para enviarlo de verdad, ver
 [Envío real por SMTP](#envío-real-por-smtp).
 
 ```bash
-npm test                  # 51 pruebas: unitarias, integración y extremo a extremo
+npm test                  # 66 pruebas: unitarias, integración y extremo a extremo
 ```
 
 ## Envío real por SMTP
@@ -95,13 +96,15 @@ reemplaza el pendiente anterior y estrena código.
 
 Hexagonal ligera, con la regla de dependencias
 `infrastructure → application → domain`. El dominio no importa Express,
-SQLite ni nodemailer.
+ningún driver de base de datos ni nodemailer. Los puertos de persistencia
+son **asíncronos**: así el dominio no asume si detrás hay una base embebida
+o un servidor al otro lado de la red.
 
 ```
 src/
   domain/         entidades, errores, reglas de validación y PUERTOS
   application/    casos de uso (RegisterUser, VerifyRegistration, …)
-  infrastructure/ adaptadores: SQLite, memoria, correo, seguridad, HTTP
+  infrastructure/ adaptadores: postgres, sqlite, memoria, correo, seguridad, HTTP
   public/         formulario y listado (HTML/CSS/JS sin framework)
 ```
 
@@ -120,13 +123,22 @@ archivo, [`src/infrastructure/config/container.js`](src/infrastructure/config/co
 | Enviar por SMTP en vez de consola | `MAIL_TRANSPORT=smtp` en `.env` | ninguna línea de código |
 | Añadir un tercer transporte (una API HTTP, por ejemplo) | una clase que implemente `MailSender` + una rama en `createMailSender.js` | casos de uso, plantilla, controladores |
 | Cambiar bcrypt por otro algoritmo | una clase nueva que implemente `PasswordHasher` + una línea | `RegisterUser` |
+| Cambiar de motor de base de datos | `DB_ENGINE=postgres` (o `sqlite`) en `.env` | ninguna línea de código |
+| Añadir un tercer motor (MySQL, por ejemplo) | una carpeta de adaptadores que implementen los puertos + un caso en `createPersistence.js` | dominio, casos de uso, controladores |
 | Probar sin base de datos | los adaptadores `persistence/memory/` | nada del dominio |
 
 ## Configuración
 
 Ver [`.env.example`](.env.example). Lo mínimo: `MAIL_TRANSPORT` (`console` o
-`smtp`), `DATABASE_PATH` y `APP_BASE_URL` (con la que se arma el enlace del
+`smtp`), `DB_ENGINE` y `APP_BASE_URL` (con la que se arma el enlace del
 correo).
+
+- `DB_ENGINE=sqlite` (por omisión) usa el archivo de `DATABASE_PATH`; no
+  requiere servidor.
+- `DB_ENGINE=postgres` requiere un servidor PostgreSQL y `DATABASE_URL`
+  (formato `postgres://usuario:password@host:5432/base`). Las migraciones se
+  aplican solas al arrancar. Las pruebas de integración de Postgres usan
+  `TEST_DATABASE_URL` y se saltan si no está definida.
 
 ## Límites conocidos
 

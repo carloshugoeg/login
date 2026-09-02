@@ -35,13 +35,13 @@ export class RegisterUser {
     if (!result.isValid) throw new InvalidRegistrationError(result.errors);
 
     const email = String(input.email).trim().toLowerCase();
-    if (this.#users.existsByEmail(email)) {
+    if (await this.#users.existsByEmail(email)) {
       throw new EmailAlreadyRegisteredError(email);
     }
 
     // Un segundo intento con el mismo correo reemplaza al pendiente anterior
     // y estrena código: el enlace viejo deja de servir.
-    this.#pendingRegistrations.removeByEmail(email);
+    await this.#pendingRegistrations.removeByEmail(email);
 
     const pending = new PendingRegistration({
       email,
@@ -53,14 +53,14 @@ export class RegisterUser {
       createdAt: new Date().toISOString(),
     });
 
-    const saved = this.#pendingRegistrations.save(pending);
+    const saved = await this.#pendingRegistrations.save(pending);
 
     try {
       await this.#sendVerificationEmail.execute(saved);
     } catch (error) {
       // Sin correo enviado no hay forma de confirmar: no dejamos basura
       // en la tabla de pendientes bloqueando un reintento.
-      this.#pendingRegistrations.removeById(saved.id);
+      await this.#pendingRegistrations.removeById(saved.id);
       throw error;
     }
     return saved;

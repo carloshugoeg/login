@@ -4,7 +4,7 @@ export function validInput(overrides = {}) {
     firstName: 'Ana',
     lastName: 'Pérez Gómez',
     age: 30,
-    password: 'secreta123',
+    password: 'secreta123!',
     ...overrides,
   };
 }

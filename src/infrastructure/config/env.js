@@ -9,9 +9,18 @@ export function loadEnv(source = process.env) {
     throw new Error(`MAIL_TRANSPORT debe ser "console" o "smtp", no "${transport}".`);
   }
 
+  const engine = (source.DB_ENGINE ?? 'sqlite').toLowerCase();
+  if (!['sqlite', 'postgres'].includes(engine)) {
+    throw new Error(`DB_ENGINE debe ser "sqlite" o "postgres", no "${engine}".`);
+  }
+
   const env = {
     port: Number(source.PORT ?? 3000),
-    databasePath: source.DATABASE_PATH ?? './data/app.db',
+    db: {
+      engine,
+      path: source.DATABASE_PATH ?? './data/app.db',
+      url: source.DATABASE_URL,
+    },
     baseUrl: source.APP_BASE_URL ?? 'http://localhost:3000',
     bcryptRounds: Number(source.BCRYPT_ROUNDS ?? 12),
     mail: {
@@ -26,6 +35,9 @@ export function loadEnv(source = process.env) {
 
   if (transport === 'smtp' && !env.mail.host) {
     throw new Error('MAIL_TRANSPORT=smtp requiere SMTP_HOST.');
+  }
+  if (engine === 'postgres' && !env.db.url) {
+    throw new Error('DB_ENGINE=postgres requiere DATABASE_URL.');
   }
   return env;
 }

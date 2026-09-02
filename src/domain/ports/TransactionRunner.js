@@ -7,7 +7,7 @@ import { NotImplementedError } from '../errors/NotImplementedError.js';
  * detrás hay SQLite, otra base de datos o memoria.
  */
 export class TransactionRunner {
-  /** @param {() => T} _work @returns {T} */
+  /** @param {() => Promise<T>|T} _work @returns {Promise<T>|T} */
   run(_work) {
     throw new NotImplementedError(this.constructor.name, 'run');
   }

@@ -4,7 +4,7 @@ export class AgeRangeRule extends Rule {
   #min;
   #max;
 
-  constructor({ min = 13, max = 120 } = {}) {
+  constructor({ min = 18, max = 120 } = {}) {
     super();
     this.#min = min;
     this.#max = max;

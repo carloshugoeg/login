@@ -14,9 +14,9 @@ export class VerificationController {
     this.verify = this.verify.bind(this);
   }
 
-  verify(req, res) {
+  async verify(req, res) {
     try {
-      const user = this.#verifyRegistration.execute(req.query.code);
+      const user = await this.#verifyRegistration.execute(req.query.code);
       res.status(200).type('html').send(renderVerificationSuccess(user));
     } catch (error) {
       if (!(error instanceof TokenNotFoundError)) throw error;

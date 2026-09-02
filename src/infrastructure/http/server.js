@@ -3,11 +3,11 @@ import { loadEnv } from '../config/env.js';
 import { createApp } from './app.js';
 
 const env = loadEnv();
-const container = buildContainer(env);
+const container = await buildContainer(env);
 const app = createApp(container);
 
 const server = app.listen(env.port, () => {
-  console.log(`Servidor en ${env.baseUrl} (correo: ${env.mail.transport})`);
+  console.log(`Servidor en ${env.baseUrl} (bd: ${env.db.engine}, correo: ${env.mail.transport})`);
 });
 
 for (const signal of ['SIGINT', 'SIGTERM']) {
